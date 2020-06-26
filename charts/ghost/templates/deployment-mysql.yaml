@@ -28,6 +28,13 @@ spec:
         image: mysql:5.7
         ports:
         - containerPort: 3306
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1000Mi
+          requests:
+            cpu: 250m
+            memory: 250Mi
         env:
         - name: MYSQL_USER
           value: {{ .Values.mysqlUser | quote }}
