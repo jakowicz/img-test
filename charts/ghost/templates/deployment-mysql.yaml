@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: {{ .Values.namespace | quote }}
+  labels:
+    app: "img"
+    component: "mysql"
+    tier: "db"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "img"
+      component: "mysql"
+      tier: "db"
+  template:
+    metadata:
+      labels:
+        app: "img"
+        component: "mysql"
+        tier: "db"
+    spec:
+      nodeSelector:
+        tier: db
+      containers:
+      - name: mysql
+        image: mysql:5.7
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_USER
+          value: {{ .Values.mysqlUser | quote }}
+        - name: MYSQL_DATABASE
+          value: {{ .Values.database_name | quote }}
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-passwords
+              key: password
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-passwords
+              key: root_password
+        volumeMounts:
+        - mountPath: /var/lib/mysql5.7
+          name: mysql-volume
+      volumes:
+        - name: mysql-volume
+          persistentVolumeClaim:
+            claimName: mysql

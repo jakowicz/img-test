@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ghost
+  namespace: {{ .Values.namespace | quote }}
+  labels:
+    app: "img"
+    component: "ghost"
+    tier: "web"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "img"
+      component: "ghost"
+      tier: "web"
+  template:
+    metadata:
+      labels:
+        app: "img"
+        component: "ghost"
+        tier: "web"
+    spec:
+      containers:
+      - name: ghost
+        image: ghost
+        ports:
+        - containerPort: 2368
+        env:
+        - name: url
+          value: {{ printf "http://%s" .Values.ghost_ip }}
+        - name: database__client
+          value: "mysql"
+        - name: "database__connection__user"
+          value: {{ .Values.mysqlUser | quote }}
+        - name: database__connection__host
+          value: "ghost-mysql"
+        - name: database__connection__password
+          valueFrom:
+            secretKeyRef:
+              name: mysql-passwords
+              key: password
+        - name: database__connection__database
+          value: {{ .Values.database_name | quote }}
+        volumeMounts:
+        - mountPath: /etc/ghost
+          name: ghost-volume
+      volumes:
+        - name: ghost-volume
+          persistentVolumeClaim:
+            claimName: ghost

@@ -1,0 +1,9 @@
+namespace: "ghost"
+
+database_name: "ghost"
+
+ghost_ip: "52.210.51.17"
+
+mysqlUser: "img"
+mysqlPassword: ""
+mysqlRootPassword: ""
